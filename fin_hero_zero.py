@@ -3,7 +3,9 @@
 #                           |---------------------------------------------------------------|
 #                           |   1. download Scripmaster using down_ks_Scripmaster.py        |
 #                           |   2. change finnifty expiry to current expiry in .env file    |
-#                           |   3. enter latest otp in .env file                            |
+#                           |   3. enter latest otp in .env file                            |   
+#                           |   4. change date in TradeApiInstruments_FNO_10_01_2023.txt    |
+#                           |       in this code                                            |
 #                           |_______________________________________________________________|
 
 from tkinter import *
