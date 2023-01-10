@@ -1,3 +1,11 @@
+#                           ________________________________________________________________
+#                           |                Before run the code                            |
+#                           |---------------------------------------------------------------|
+#                           |   1. download Scripmaster using down_ks_Scripmaster.py        |
+#                           |   2. change finnifty expiry to current expiry in .env file    |
+#                           |   3. enter latest otp in .env file                            |
+#                           |_______________________________________________________________|
+
 from tkinter import *
 from asyncio.windows_events import NULL
 import ks_api_client
