@@ -27,7 +27,7 @@ otp = os.getenv("otp")
 expiry = os.getenv("finnifty_expiry")
 instrumentName = 'FINNIFTY'
 
-df = pd.read_csv ("TradeApiInstruments_FNO_10_01_2023.txt",sep="|")
+df = pd.read_csv ("ks_fno_scripmaster.txt",sep="|")
 client = ks_api.KSTradeApi(access_token = access_token, userid = userid, \
                 consumer_key = consumer_key, ip = "127.0.0.1", app_id = "", host = host)
 isbuyfince = 0

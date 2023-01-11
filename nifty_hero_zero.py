@@ -16,7 +16,7 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import time
-df = pd.read_csv ("TradeApiInstruments_FNO_10_01_2023.txt",sep="|") #change needed every day
+df = pd.read_csv ("ks_fno_scripmaster.txt",sep="|") #change needed every day
 load_dotenv()
 access_token = os.getenv("access_token")
 userid = os.getenv("userid")
