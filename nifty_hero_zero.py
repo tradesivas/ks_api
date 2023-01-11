@@ -38,23 +38,23 @@ def buy_niftyce():
     if isbuyniftyce == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        quote_response = client.quote(instrument_token = 35881)
+        quote_response = client.quote(instrument_token = underlying_token)
         ltp = quote_response['success'][0]['ltp']
         ltp = float(ltp)
         atm = round(ltp/50)*50
         print(atm)
-        ceinstrumentToken = df.loc[(df['instrumentName'] == 'FINNIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'CE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
+        ceinstrumentToken = df.loc[(df['instrumentName'] == 'NIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'CE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
         ceinstrumentToken  = int(ceinstrumentToken)
         order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "BUY",\
-                   quantity = 40, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("Buy order placed for FINNIFTY Option CE")
+        print("Buy order placed for NIFTY Option CE")
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 40)) and status == 'OPN':
+        while ((netq != 0) or (netq == 50)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -64,16 +64,16 @@ def buy_niftyce():
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
         isbuyniftyce+= 1
-        print("Buy CE Order Filled")
+        print("Buy NIFTY CE Order Filled")
     
 def sell_niftyce():
     global isbuyniftyce
     global ceinstrumentToken
     if isbuyniftyce == 1:
         order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "SELL",\
-                   quantity = 40, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
-        print('Sell order placed for FINNIFTY Option CE')
+        print('Sell order placed for NIFTY Option CE')
     else:
         print('No CE option to Sell')
 
@@ -83,23 +83,23 @@ def buy_niftype():
     if isbuyniftype == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        quote_response = client.quote(instrument_token = 35881)
+        quote_response = client.quote(instrument_token = underlying_token)
         ltp = quote_response['success'][0]['ltp']
         ltp = float(ltp)
         atm = round(ltp/50)*50
         print(atm)
-        peinstrumentToken = df.loc[(df['instrumentName'] == 'FINNIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'PE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
+        peinstrumentToken = df.loc[(df['instrumentName'] == 'NIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'PE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
         peinstrumentToken  = int(peinstrumentToken)
         order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken, transaction_type = "BUY",\
-                   quantity = 40, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("Buy order placed for FINNIFTY Option PE")
+        print("Buy order placed for NIFTY Option PE")
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 40)) and status == 'OPN':
+        while ((netq != 0) or (netq == 50)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -109,31 +109,31 @@ def buy_niftype():
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
         isbuyniftype+= 1
-        print("Buy PE Order Filled")
+        print("Buy NIFTY PE Order Filled")
     
 def sell_niftype():
     global isbuyniftype
     global peinstrumentToken
     if isbuyniftype == 1:
         order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken, transaction_type = "SELL",\
-                   quantity = 40, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
-        print('Sell order placed for FINNIFTY Option PE')
+        print('Sell order placed for NIFTY Option PE')
     else:
         print('No PE option to Sell')
 
-root = Tk()
-frame = Frame(root)
+niftyroot = Tk()
+frame = Frame(niftyroot)
 frame.pack()
-bottomframe = Frame(root)
+bottomframe = Frame(niftyroot)
 bottomframe.pack( side = BOTTOM )
-buy_niftyce_button = Button(frame, text = 'FINNIFTY CE'+'\n\n'+'1', bg = 'green', fg ='black',height = 5, width = 15, command=buy_niftyce)
+buy_niftyce_button = Button(frame, text = 'NIFTY CE'+'\n\n'+'1', bg = 'yellow', fg ='black',height = 5, width = 15, command=buy_niftyce)
 buy_niftyce_button.pack( side = LEFT)
-sell_niftyce_button = Button(frame, text = 'FINNIFTY CE'+'\n\n'+'1', bg = 'red', fg ='black',height = 5, width = 15, command=sell_niftyce)
+sell_niftyce_button = Button(frame, text = 'NIFTY CE'+'\n\n'+'1', bg = 'red', fg ='black',height = 5, width = 15, command=sell_niftyce)
 sell_niftyce_button.pack( side = LEFT)
-buy_niftype_button = Button(bottomframe, text = 'FINNIFTY PE'+'\n\n'+'1', bg = 'green', fg ='black',height = 5, width = 15, command=buy_niftype)
+buy_niftype_button = Button(bottomframe, text = 'NIFTY PE'+'\n\n'+'1', bg = 'yellow', fg ='black',height = 5, width = 15, command=buy_niftype)
 buy_niftype_button.pack( side = LEFT)
-sell_niftype_button = Button(bottomframe, text = 'FINNIFTY PE'+'\n\n'+'1', bg = 'red', fg ='black',height = 5, width = 15, command=sell_niftype)
+sell_niftype_button = Button(bottomframe, text = 'NIFTY PE'+'\n\n'+'1', bg = 'red', fg ='black',height = 5, width = 15, command=sell_niftype)
 sell_niftype_button.pack( side = LEFT)
-root.attributes('-topmost',True)
-root.mainloop()
+niftyroot.attributes('-topmost',True)
+niftyroot.mainloop()
