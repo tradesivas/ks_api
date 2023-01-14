@@ -74,6 +74,7 @@ def sell_bankniftyce():
                    quantity = 25, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
         print('Sell order placed for BANKNIFTY Option CE')
+        isbuybankniftyce-= 1
     else:
         print('No BANKNIFTY CE option to Sell')
 
@@ -119,6 +120,7 @@ def sell_bankniftype():
                    quantity = 25, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
         print('Sell order placed for BANKNIFTY Option PE')
+        isbuybankniftype-= 1
     else:
         print('No BANKNIFTY PE option to Sell')
 
