@@ -28,12 +28,18 @@ underlying_token = 11721
 
 client = ks_api.KSTradeApi(access_token = access_token, userid = userid, \
                 consumer_key = consumer_key, ip = "127.0.0.1", app_id = "", host = host)
-isbuyniftyce = 0
-isbuyniftype = 0
+isbuyniftyceatm = 0
+issellniftyceotm = 0
+iscespreadfilled = False
+isbuyniftypeatm = 0
+isselniftypeotm = 0
 def buy_niftyce():
-    global isbuyniftyce
-    global ceinstrumentToken
-    if isbuyniftyce == 0:
+    global isbuyniftyceatm
+    global issellniftyceotm
+    global iscespreadfilled
+    global atmceinstrumentToken
+    global otmceinstrumentToken
+    if isbuyniftyceatm == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
         quote_response = client.quote(instrument_token = underlying_token)
@@ -41,9 +47,10 @@ def buy_niftyce():
         ltp = float(ltp)
         atm = round(ltp/50)*50
         print(atm)
-        ceinstrumentToken = df.loc[(df['instrumentName'] == 'NIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'CE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
-        ceinstrumentToken  = int(ceinstrumentToken)
-        order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "BUY",\
+        atmceinstrumentToken = df.loc[(df['instrumentName'] == 'NIFTY') & (df['expiry'] == expiry) & (df['optionType'] == 'CE') & (df['strike'] == atm), 'instrumentToken'].iloc[0]
+        atmceinstrumentToken  = int(atmceinstrumentToken)
+        otmceinstrumentToken = atmceinstrumentToken + 50
+        order_response = client.place_order(order_type = "N", instrument_token = atmceinstrumentToken, transaction_type = "BUY",\
                    quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("Buy order placed for NIFTY Option CE")
@@ -61,24 +68,96 @@ def buy_niftyce():
             print(netq)
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
-        isbuyniftyce+= 1
-        print("Buy NIFTY CE Order Filled")
+        isbuyniftyceatm+= 1
+        print("BUY NIFTY CE Order Filled")
+        if isbuyniftyceatm == 1:
+            order_response = client.place_order(order_type = "N", instrument_token = otmceinstrumentToken, transaction_type = "SELL",\
+                    quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
+            print("SELL order placed for NIFTY Option CE")
+            print(order_response)
+            o_id = order_response['Success']['NSE']['orderId']
+            print("OrderId= ",o_id)
+            netq = 99999
+            status = 'OPN'
+            while ((netq != 0) or (netq == 50)) and status == 'OPN':
+                o_r=client.order_report(order_id = o_id)
+                print(o_r)
+                l1 = len(o_r['success'])
+                print("Lenth = ",l1)
+                netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
+                print(netq)
+                status = (o_r['success'][(l1-1)]['status'])
+                time.sleep(1)
+            issellniftyceotm+= 1
+        print("SELL NIFTY CE Order Filled")
+        if (isbuyniftyceatm == 1) & (issellniftyceotm == 1):
+            print("Nifty Debit Call Spread Order Filled Successfully")
+            iscespreadfilled = True
+    else:
+        print("There must be a open position already, Order Not placed")
     
 def sell_niftyce():
-    global isbuyniftyce
-    global ceinstrumentToken
-    if isbuyniftyce == 1:
-        order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "SELL",\
+    global isbuyniftyceatm
+    global issellniftyceatm
+    global issellniftyceotm
+    global isbuyniftyceotm
+    global atmceinstrumentToken
+    global otmceinstrumentToken
+    if iscespreadfilled == 1:
+        order_response = client.place_order(order_type = "N", instrument_token = otmceinstrumentToken, transaction_type = "BUY",\
                    quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
-        print('Sell order placed for NIFTY Option CE')
+        print('Buy order placed for NIFTY OTM Option CE')
+        print(order_response)
+        o_id = order_response['Success']['NSE']['orderId']
+        print("OrderId= ",o_id)
+        netq = 99999
+        status = 'OPN'
+        while ((netq != 0) or (netq == 50)) and status == 'OPN':
+            o_r=client.order_report(order_id = o_id)
+            print(o_r)
+            l1 = len(o_r['success'])
+            print("Lenth = ",l1)
+            netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
+            print(netq)
+            status = (o_r['success'][(l1-1)]['status'])
+            time.sleep(1)
+        issellniftyceotm-= 1
+        print("BUY NIFTY OTM CE Order Filled")
+        if issellniftyceotm == 0:
+            order_response = client.place_order(order_type = "N", instrument_token = atmceinstrumentToken, transaction_type = "SELL",\
+                    quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
+            print("SELL order placed for NIFTY ATM Option CE")
+            print(order_response)
+            o_id = order_response['Success']['NSE']['orderId']
+            print("OrderId= ",o_id)
+            netq = 99999
+            status = 'OPN'
+            while ((netq != 0) or (netq == 50)) and status == 'OPN':
+                o_r=client.order_report(order_id = o_id)
+                print(o_r)
+                l1 = len(o_r['success'])
+                print("Lenth = ",l1)
+                netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
+                print(netq)
+                status = (o_r['success'][(l1-1)]['status'])
+                time.sleep(1)
+            isbuyniftyceatm-= 1
+        print("SELL NIFTY ATM CE Order Filled")
+        if (isbuyniftyceatm == 0) & (issellniftyceotm == o):
+            print("Nifty Debit Call Spread EXIT Order Filled Successfully")
+            iscespreadfilled = False
+        else:
+            print("Something went wrong while Exiting Nifty Debit Call Spread, Check Positions manually")
     else:
-        print('No CE option to Sell')
+        print('No Nifty Debit Call Spread option to Exit')
 
 def buy_niftype():
-    global isbuyniftype
+    global isbuyniftypeatm
     global peinstrumentToken
-    if isbuyniftype == 0:
+    if isbuyniftypeatm == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
         quote_response = client.quote(instrument_token = underlying_token)
@@ -106,13 +185,13 @@ def buy_niftype():
             print(netq)
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
-        isbuyniftype+= 1
+        isbuyniftypeatm+= 1
         print("Buy NIFTY PE Order Filled")
     
 def sell_niftype():
-    global isbuyniftype
+    global isbuyniftypeatm
     global peinstrumentToken
-    if isbuyniftype == 1:
+    if isbuyniftypeatm == 1:
         order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken, transaction_type = "SELL",\
                    quantity = 50, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button sellif 1", validity = "GFD", variety = "REGULAR")
