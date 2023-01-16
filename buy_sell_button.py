@@ -38,7 +38,7 @@ def buy_mcx():
         order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "BUY",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("NEW Buy order placed for MCX")
+        print("NEW Buy order placed for ", instrumentName)
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
@@ -54,14 +54,14 @@ def buy_mcx():
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
         isbuymcx+= 1
-        print("New Buy order Filled for MCX")
+        print("New Buy order Filled for ", instrumentName)
     elif issellmcx == 1 and isbuymcx ==0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
         order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "BUY",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("Exit Buy order placed for Sold MCX")
+        print("Exit Buy order placed for Sold ", instrumentName)
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
@@ -76,11 +76,11 @@ def buy_mcx():
             print(netq)
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
-        print("Exit Buy order Filled for Sold MCX")
+        print("Exit Buy order Filled for Sold ", instrumentName)
         isbuymcx = 0
         issellmcx = 0
     else:
-        print('MCX already bought')
+        print(instrumentName, ' already bought')
 def sell_mcx():
     global isbuymcx
     global issellmcx
@@ -90,7 +90,7 @@ def sell_mcx():
         order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "SELL",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("NEW Sell order placed for MCX")
+        print("NEW Sell order placed for ", instrumentName)
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
@@ -105,7 +105,7 @@ def sell_mcx():
             print(netq)
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
-        print('New Sell order placed for mcx')
+        print('New Sell order placed for ', instrumentName)
         issellmcx+= 1
     elif isbuymcx == 1 and issellmcx ==0:
         client.login(password = password)
@@ -113,7 +113,7 @@ def sell_mcx():
         order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "SELL",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
-        print("Exit Sell order placed for Bought MCX")
+        print("Exit Sell order placed for Bought ", instrumentName)
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
@@ -128,11 +128,11 @@ def sell_mcx():
             print(netq)
             status = (o_r['success'][(l1-1)]['status'])
             time.sleep(1)
-        print('Exit Buy order filled for MCX')
+        print('Exit Buy order filled for ', instrumentName)
         isbuysilvermic = 0
         issellsilvermic = 0
     else:
-        print('MCX already sold')
+        print(instrumentName, ' already sold')
 
 root = Tk()
 frame = Frame(root)
