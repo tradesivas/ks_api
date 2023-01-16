@@ -16,7 +16,7 @@ password = os.getenv("password")
 host = os.getenv("host")
 otp = os.getenv("otp")
 amount = 10000
-instrumentName = input("Enter Instrument Name: ")
+instrumentName = input("Enter Instrument Name: ").upper()
 instrumentToken = df.loc[(df['instrumentName'] == instrumentName) & (df['instrumentType'] == 'EQ') & (df['segment'] == 'CASH') & (df['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
 instrumentToken  = int(instrumentToken)
 client = ks_api.KSTradeApi(access_token = access_token, userid = userid, \
