@@ -29,7 +29,7 @@ def buy_mcx():
         client.login(password = password)
         client.session_2fa(access_code = otp)
         order_response = client.place_order(order_type = "N", instrument_token = 11163, transaction_type = "BUY",\
-                   quantity = 10, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 6, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("NEW Buy order placed for MCX")
         print(order_response)
@@ -37,7 +37,7 @@ def buy_mcx():
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 10)) and status == 'OPN':
+        while ((netq != 0) or (netq == 6)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -52,7 +52,7 @@ def buy_mcx():
         client.login(password = password)
         client.session_2fa(access_code = otp)
         order_response = client.place_order(order_type = "N", instrument_token = 11163, transaction_type = "BUY",\
-                   quantity = 10, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 6, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("Exit Buy order placed for Sold MCX")
         print(order_response)
@@ -60,7 +60,7 @@ def buy_mcx():
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 10)) and status == 'OPN':
+        while ((netq != 0) or (netq == 6)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -81,7 +81,7 @@ def sell_mcx():
         client.login(password = password)
         client.session_2fa(access_code = otp)
         order_response = client.place_order(order_type = "N", instrument_token = 11163, transaction_type = "SELL",\
-                   quantity = 10, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 6, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("NEW Sell order placed for MCX")
         print(order_response)
@@ -89,7 +89,7 @@ def sell_mcx():
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 10)) and status == 'OPN':
+        while ((netq != 0) or (netq == 6)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -104,7 +104,7 @@ def sell_mcx():
         client.login(password = password)
         client.session_2fa(access_code = otp)
         order_response = client.place_order(order_type = "N", instrument_token = 11163, transaction_type = "SELL",\
-                   quantity = 10, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   quantity = 6, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("Exit Sell order placed for Bought MCX")
         print(order_response)
@@ -112,7 +112,7 @@ def sell_mcx():
         print("OrderId= ",o_id)
         netq = 99999
         status = 'OPN'
-        while ((netq != 0) or (netq == 10)) and status == 'OPN':
+        while ((netq != 0) or (netq == 6)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)
             print(o_r)
             l1 = len(o_r['success'])
@@ -132,9 +132,9 @@ frame = Frame(root)
 frame.pack()
 bottomframe = Frame(root)
 bottomframe.pack( side = BOTTOM )
-buy_mcx_button = Button(frame, text = 'MCX'+'\n\n'+'10', bg = 'green', fg ='black',height = 5, width = 15, command=buy_mcx)
+buy_mcx_button = Button(frame, text = 'MCX'+'\n\n'+'6', bg = 'green', fg ='black',height = 5, width = 15, command=buy_mcx)
 buy_mcx_button.pack( side = LEFT)
-sell_mcx_button = Button(frame, text = 'MCX'+'\n\n'+'10', bg = 'red', fg ='black',height = 5, width = 15, command=sell_mcx)
+sell_mcx_button = Button(frame, text = 'MCX'+'\n\n'+'6', bg = 'red', fg ='black',height = 5, width = 15, command=sell_mcx)
 sell_mcx_button.pack( side = LEFT)
 root.attributes('-topmost',True)
 root.mainloop()
