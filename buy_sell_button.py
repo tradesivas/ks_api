@@ -135,6 +135,7 @@ def sell_mcx():
         print(instrumentName, ' already sold')
 
 root = Tk()
+root.title("CASH " + instrumentName)
 frame = Frame(root)
 frame.pack()
 bottomframe = Frame(root)
