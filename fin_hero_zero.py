@@ -121,6 +121,7 @@ def sell_finpe():
         print('No PE option to Sell')
 
 finroot = Tk()
+finroot.title("FIN Hero Zero")
 frame = Frame(finroot)
 frame.pack()
 bottomframe = Frame(finroot)
