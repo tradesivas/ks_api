@@ -14,6 +14,7 @@ import os
 from dotenv import load_dotenv
 import pandas as pd
 import time
+df1 = pd.read_csv ("ks_cash_scripmaster.txt",sep="|")
 df = pd.read_csv ("ks_fno_scripmaster.txt",sep="|") #change needed every day
 load_dotenv()
 access_token = os.getenv("access_token")
@@ -24,8 +25,9 @@ host = os.getenv("host")
 otp = os.getenv("otp")
 expiry = os.getenv("banknifty_expiry")
 instrumentName = 'BANKNIFTY'
-underlying_token = 11717
-
+underlying_name = 'NIFTY BANK'
+underlying_token  = df1.loc[(df1['instrumentName'] == underlying_name) & (df1['instrumentType'] == 'IN') & (df1['segment'] == '-') & (df1['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
+underlying_token  = int(underlying_token)
 client = ks_api.KSTradeApi(access_token = access_token, userid = userid, \
                 consumer_key = consumer_key, ip = "127.0.0.1", app_id = "", host = host)
 isbuybankniftyce = 0
