@@ -15,7 +15,7 @@ consumer_key = os.getenv("consumer_key")
 password = os.getenv("password")
 host = os.getenv("host")
 otp = os.getenv("otp")
-amount = 10000
+amount = 9000
 instrumentName = input("Enter Instrument Name: ").upper()
 instrumentToken = df.loc[(df['instrumentName'] == instrumentName) & (df['instrumentType'] == 'EQ') & (df['segment'] == 'CASH') & (df['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
 instrumentToken  = int(instrumentToken)
@@ -35,7 +35,7 @@ def buy_mcx():
     if isbuymcx == 0 and issellmcx == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "BUY",\
+        order_response = client.place_order(order_type = "MIS", instrument_token = instrumentToken, transaction_type = "BUY",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("NEW Buy order placed for ", instrumentName)
@@ -58,7 +58,7 @@ def buy_mcx():
     elif issellmcx == 1 and isbuymcx ==0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "BUY",\
+        order_response = client.place_order(order_type = "MIS", instrument_token = instrumentToken, transaction_type = "BUY",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("Exit Buy order placed for Sold ", instrumentName)
@@ -87,7 +87,7 @@ def sell_mcx():
     if issellmcx == 0 and isbuymcx == 0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "SELL",\
+        order_response = client.place_order(order_type = "MIS", instrument_token = instrumentToken, transaction_type = "SELL",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("NEW Sell order placed for ", instrumentName)
@@ -110,7 +110,7 @@ def sell_mcx():
     elif isbuymcx == 1 and issellmcx ==0:
         client.login(password = password)
         client.session_2fa(access_code = otp)
-        order_response = client.place_order(order_type = "N", instrument_token = instrumentToken, transaction_type = "SELL",\
+        order_response = client.place_order(order_type = "MIS", instrument_token = instrumentToken, transaction_type = "SELL",\
                    quantity = qty, price = 0, disclosed_quantity = 0, trigger_price = 0,\
                    tag = "python Button buyif 1", validity = "GFD", variety = "REGULAR")
         print("Exit Sell order placed for Bought ", instrumentName)

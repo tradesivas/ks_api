@@ -1,5 +1,3 @@
-from asyncio.windows_events import NULL
-import ks_api_client
 from ks_api_client import ks_api
 import os
 from dotenv import load_dotenv
