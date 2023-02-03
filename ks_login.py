@@ -31,3 +31,10 @@ print(session_response)
 logout_response = client.logout()
 print("---------------logout response---------------")
 print(logout_response)
+#Storing New OPT to .env file
+oldotp = os.getenv("otp")
+with open(".env",'r') as file :
+        filedata = file.read()
+filedata = filedata.replace(oldotp,newotp)
+with open(".env",'w') as file :
+        file.write(filedata)
