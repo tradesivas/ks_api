@@ -19,7 +19,7 @@ login_response = client.login(password = password)
 print("---------------login response---------------")
 print(login_response)
 #Generated session token
-print("OTp is: ",otp)
+print("OTP is: ",otp)
 session_response = client.session_2fa(access_code = otp)
 print("---------------session response---------------")
 print(session_response)
