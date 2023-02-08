@@ -2,6 +2,7 @@ from ks_api_client import ks_api
 import os
 from dotenv import load_dotenv
 import pandas as pd
+import time
 
 #####################################################################
 
@@ -22,7 +23,6 @@ login_response = client.login(password = password)
 print("---------------login response---------------")
 print(login_response)
 #Generated session token
-print("OTP is: ",otp)
 session_response = client.session_2fa(access_code = otp)
 print("---------------session response---------------")
 print(session_response)
@@ -49,6 +49,7 @@ ceinstrumentToken = fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expir
 ceinstrumentToken  = int(ceinstrumentToken)
 peinstrumentToken = fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0]
 peinstrumentToken  = int(peinstrumentToken)
+strike = str(atm)
 
 ##############################################################################
 
@@ -78,44 +79,65 @@ try:
         print(df1)
         celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken), 'null_2'].iloc[0])
         peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
-        print("CE LTP = ", celtp)
-        print("PE LTP = ", peltp)
+        print(strike,"CE LTP = ", celtp)
+        print(strike,"PE LTP = ", peltp)
         if (celtp < (peltp/4)) and (celtp < max_opt_price) and issell == 0:
             ###################################################
             order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "SELL",\
                    quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = 0,\
-                   tag = "bnf_3pm_ex.py | Entry for Sell CE", validity = "GFD", variety = "REGULAR")
+                   tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
             print("Sell order placed for BANKNIFTY Option CE")
             print(order_response)
             o_id = order_response['Success']['NSE']['orderId']
             print("OrderId= ",o_id)
             netq = 99999
-            status = 'OPN'
-            while ((netq != 0) or (netq == lot)) and status == 'OPN':
+            while netq != 0:
                 o_r=client.order_report(order_id = o_id)
                 print(o_r)
                 l1 = len(o_r['success'])
                 print("Lenth = ",l1)
                 netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
                 print(netq)
-                status = (o_r['success'][(l1-1)]['status'])
                 time.sleep(1)
-            print("Sell BANKNIFTY CE Order Filled")
+            print("Sell order Filled for CE at Rs.", celtp, " * ", lot, " = Rs.", (celtp*lot))
+            issell = 1
+            cesold = celtp            
                             ###########
-            order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "Buy",\
+            sl_order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken, transaction_type = "Buy",\
                    quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = (2.5*cesold),\
-                   tag = "bnf_3pm_ex.py | SL for CE sold", validity = "GFD", variety = "REGULAR")
+                   tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
 
             ###################################################
-            print("Sell order placed for CE at Rs.", celtp, " * ", lot, " = Rs.", (celtp*lot))
-            issell = 1
-            cesold = celtp
+
         elif (peltp < (celtp/4)) and (peltp < max_opt_price) and issell == 0:
-            print("Sell order placed for PE at Rs.", peltp, " * ", lot, " = Rs.", (peltp*lot))
+            ###################################################
+            order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken, transaction_type = "SELL",\
+                   quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = 0,\
+                   tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
+            print("Sell order placed for BANKNIFTY Option PE")
+            print(order_response)
+            o_id = order_response['Success']['NSE']['orderId']
+            print("OrderId= ",o_id)
+            netq = 99999
+            while netq != 0:
+                o_r=client.order_report(order_id = o_id)
+                print(o_r)
+                l1 = len(o_r['success'])
+                print("Lenth = ",l1)
+                netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
+                print("Pending Qty = ",netq)
+                time.sleep(1)
+            print("Sell order filled for PE at Rs.", peltp, " * ", lot, " = Rs.", (peltp*lot))
             issell = 2
-            pesold = peltp
+            pesold = peltp            
+                            ###########
+            sl_order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken, transaction_type = "Buy",\
+                   quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = (2.5*pesold),\
+                   tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
+
+            ###################################################
         elif issell == 1:
-            print("Already Sold CE at Rs.", cesold, " * ", lot, " = Rs.", (cesold*lot)")
+            print("Already Sold CE at Rs.", cesold, " * ", lot, " = Rs.", (cesold*lot))
             print("P&L= Rs.",((cesold - celtp)*lot) )
         elif issell == 2:
             print("Already Sold PE")
@@ -123,7 +145,7 @@ try:
         else:
             print("No TRADE")
 
-    client.subscribe(input_tokens=ceinstrumentToken,peinstrumentToken, callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
+    client.subscribe(input_tokens=(ceinstrumentToken,peinstrumentToken), callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
 
 except Exception as e:
     print("Exception when calling StreamingApi->subscribe: %s\n" % e)
