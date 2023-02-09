@@ -20,12 +20,12 @@ client = ks_api.KSTradeApi(access_token = access_token, userid = userid, \
                 consumer_key = consumer_key,consumer_secret = consumer_secret, ip = "127.0.0.1", app_id = "", host = host)
 # Get session for user
 login_response = client.login(password = password)
-print("---------------login response---------------")
-print(login_response)
+#print("---------------login response---------------")
+#print(login_response)
 #Generated session token
 session_response = client.session_2fa(access_code = otp)
-print("---------------session response---------------")
-print(session_response)
+#print("---------------session response---------------")
+#print(session_response)
 
 ############################################################################
 
@@ -45,11 +45,14 @@ ltp = quote_response['success'][0]['ltp']
 ltp = float(ltp)
 atm = round(ltp/100)*100
 strike = str(atm)
-print(atm)
-ceinstrumentToken = fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'CE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0]
+#print(atm)
+ceinstrumentToken = str(fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'CE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0])
+#print("type = ", type(ceinstrumentToken))
 ceinstrumentToken_int  = int(ceinstrumentToken)
-peinstrumentToken = fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0]
+#print("type ", type(ceinstrumentToken_int))
+peinstrumentToken = str(fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0])
 peinstrumentToken_int  = int(peinstrumentToken)
+ws_token = ceinstrumentToken + ',' + peinstrumentToken
 
 
 ##############################################################################
@@ -77,9 +80,9 @@ try:
         #     print("Nifty Greater than 17712")
         #print("LTP is: ",ltp)
         df1 = pd.concat([df,df1])
-        print(df1)
-        celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken_int), 'null_2'].iloc[0])
-        peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken_int), 'null_2'].iloc[0])
+        #print(df1)
+        celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken), 'null_2'].iloc[0])
+        peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
         print(strike,"CE LTP = ", celtp)
         print(strike,"PE LTP = ", peltp)
         if (celtp < (peltp/4)) and (celtp < max_opt_price) and issell == 0:
@@ -146,7 +149,7 @@ try:
         else:
             print("No TRADE")
 
-    client.subscribe(input_tokens=(ceinstrumentToken,peinstrumentToken), callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
+    client.subscribe(input_tokens=ws_token, callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
 
 except Exception as e:
     print("Exception when calling StreamingApi->subscribe: %s\n" % e)
