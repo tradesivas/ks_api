@@ -36,8 +36,8 @@ instrumentName = 'BANKNIFTY'
 underlying_name = 'NIFTY BANK'
 max_opt_price = 9.5
 lot = 25
-underlying_token  = cash.loc[(cash['instrumentName'] == underlying_name) & (cash['instrumentType'] == 'IN') & (cash['segment'] == '-') & (cash['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
-underlying_token  = int(underlying_token)
+underlying_token  = str(cash.loc[(cash['instrumentName'] == underlying_name) & (cash['instrumentType'] == 'IN') & (cash['segment'] == '-') & (cash['exchange'] == 'NSE'), 'instrumentToken'].iloc[0])
+underlying_token_int  = int(underlying_token)
 client.login(password = password)
 client.session_2fa(access_code = otp)
 quote_response = client.quote(instrument_token = underlying_token)
@@ -52,7 +52,7 @@ ceinstrumentToken_int  = int(ceinstrumentToken)
 #print("type ", type(ceinstrumentToken_int))
 peinstrumentToken = str(fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0])
 peinstrumentToken_int  = int(peinstrumentToken)
-ws_token = ceinstrumentToken + ',' + peinstrumentToken
+ws_token = underlying_token + ',' + ceinstrumentToken + ',' + peinstrumentToken
 
 
 ##############################################################################
@@ -68,7 +68,7 @@ issell = 0
 try:
     def callback_method(message):
         #print(message)
-        global df, df1, ltp, celtp, peltp, issell, cesold, pesold
+        global df, df1, ltp, celtp, peltp, issell, cesold, pesold,ulltp
         #print("Your logic/computation will come here.")
         #print(type(message))
         df = pd.DataFrame([message])
@@ -81,6 +81,7 @@ try:
         #print("LTP is: ",ltp)
         df1 = pd.concat([df,df1])
         #print(df1)
+        ulltp = float(df1.loc[(df1['opt_token'] == underlying_token), 'null_2'].iloc[0])
         celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken), 'null_2'].iloc[0])
         peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
         print(strike,"CE LTP = ", celtp)
