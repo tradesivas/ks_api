@@ -36,6 +36,9 @@ instrumentName = 'BANKNIFTY'
 underlying_name = 'NIFTY BANK'
 max_opt_price = 9.5
 lot = 25
+
+############################################################################
+
 underlying_token  = cash.loc[(cash['instrumentName'] == underlying_name) & (cash['instrumentType'] == 'IN') & (cash['segment'] == '-') & (cash['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
 underlying_token  = int(underlying_token)
 client.login(password = password)
@@ -53,7 +56,6 @@ ceinstrumentToken_int  = int(ceinstrumentToken)
 peinstrumentToken = str(fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0])
 peinstrumentToken_int  = int(peinstrumentToken)
 ws_token = ceinstrumentToken + ',' + peinstrumentToken
-
 
 ##############################################################################
 
@@ -85,6 +87,7 @@ try:
         peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
         print(strike,"CE LTP = ", celtp)
         print(strike,"PE LTP = ", peltp)
+        ###################################################################################
         if (celtp < (peltp/4)) and (celtp < max_opt_price) and issell == 0:
             ###################################################
             # order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken_int, transaction_type = "SELL",\
@@ -131,6 +134,7 @@ try:
             #     netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
             #     print("Pending Qty = ",netq)
             #     time.sleep(1)
+            ######################################################
             print("Sell order filled for PE at Rs.", peltp, " * ", lot, " = Rs.", (peltp*lot))
             issell = 2
             pesold = peltp            
@@ -148,7 +152,7 @@ try:
             print("P&L= Rs.",((pesold - peltp)*lot) )
         else:
             print("No TRADE")
-
+        ########################################################
     client.subscribe(input_tokens=ws_token, callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
 
 except Exception as e:
