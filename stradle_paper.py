@@ -36,8 +36,11 @@ instrumentName = 'BANKNIFTY'
 underlying_name = 'NIFTY BANK'
 max_opt_price = 9.5
 lot = 25
-underlying_token  = str(cash.loc[(cash['instrumentName'] == underlying_name) & (cash['instrumentType'] == 'IN') & (cash['segment'] == '-') & (cash['exchange'] == 'NSE'), 'instrumentToken'].iloc[0])
-underlying_token_int  = int(underlying_token)
+
+############################################################################
+
+underlying_token  = cash.loc[(cash['instrumentName'] == underlying_name) & (cash['instrumentType'] == 'IN') & (cash['segment'] == '-') & (cash['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
+underlying_token  = int(underlying_token)
 client.login(password = password)
 client.session_2fa(access_code = otp)
 quote_response = client.quote(instrument_token = underlying_token)
@@ -52,8 +55,7 @@ ceinstrumentToken_int  = int(ceinstrumentToken)
 #print("type ", type(ceinstrumentToken_int))
 peinstrumentToken = str(fno.loc[(fno['instrumentName'] == 'BANKNIFTY') & (fno['expiry'] == expiry) & (fno['optionType'] == 'PE') & (fno['strike'] == atm), 'instrumentToken'].iloc[0])
 peinstrumentToken_int  = int(peinstrumentToken)
-ws_token = underlying_token# + ',' + ceinstrumentToken + ',' + peinstrumentToken
-
+ws_token = ceinstrumentToken + ',' + peinstrumentToken
 
 ##############################################################################
 
@@ -68,7 +70,7 @@ issell = 0
 try:
     def callback_method(message):
         #print(message)
-        global df, df1, ltp, celtp, peltp, issell, cesold, pesold,ulltp
+        global df, df1, ltp, celtp, peltp, issell, cesold, pesold, stradle_premium, sold_stradle_premium
         #print("Your logic/computation will come here.")
         #print(type(message))
         df = pd.DataFrame([message])
@@ -81,12 +83,14 @@ try:
         #print("LTP is: ",ltp)
         df1 = pd.concat([df,df1])
         #print(df1)
-        ulltp = float(df1.loc[(df1['opt_token'] == underlying_token), 'null_2'].iloc[0])
         celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken), 'null_2'].iloc[0])
         peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
+        stradle_premium = celtp + peltp
         print(strike,"CE LTP = ", celtp)
         print(strike,"PE LTP = ", peltp)
-        if (celtp < (peltp/4)) and (celtp < max_opt_price) and issell == 0:
+        print("Stradle Premium = ", stradle_premium)
+        ###################################################################################
+        if issell == 0:
             ###################################################
             # order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken_int, transaction_type = "SELL",\
             #        quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = 0,\
@@ -105,8 +109,12 @@ try:
             #     print(netq)
             #     time.sleep(1)
             print("Sell order Filled for CE at Rs.", celtp, " * ", lot, " = Rs.", (celtp*lot))
+            print("Sell order filled for PE at Rs.", peltp, " * ", lot, " = Rs.", (peltp*lot))
             issell = 1
-            cesold = celtp            
+            cesold = celtp
+            pesold = peltp
+            sold_stradle_premium = cesold + pesold
+            print("Premium Collected = ", "%.2f" % (sold_stradle_premium * lot))     
                             ###########
             # sl_order_response = client.place_order(order_type = "N", instrument_token = ceinstrumentToken_int, transaction_type = "Buy",\
             #        quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = (2.5*cesold),\
@@ -114,42 +122,12 @@ try:
 
             ###################################################
 
-        elif (peltp < (celtp/4)) and (peltp < max_opt_price) and issell == 0:
-            ###################################################
-            # order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken_int, transaction_type = "SELL",\
-            #        quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = 0,\
-            #        tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
-            # print("Sell order placed for BANKNIFTY Option PE")
-            # print(order_response)
-            # o_id = order_response['Success']['NSE']['orderId']
-            # print("OrderId= ",o_id)
-            # netq = 99999
-            # while netq != 0:
-            #     o_r=client.order_report(order_id = o_id)
-            #     print(o_r)
-            #     l1 = len(o_r['success'])
-            #     print("Lenth = ",l1)
-            #     netq = (o_r['success'][(l1-1)]['orderQuantity']) - (o_r['success'][(l1-1)]['filledQuantity'])
-            #     print("Pending Qty = ",netq)
-            #     time.sleep(1)
-            print("Sell order filled for PE at Rs.", peltp, " * ", lot, " = Rs.", (peltp*lot))
-            issell = 2
-            pesold = peltp            
-                            ###########
-            # sl_order_response = client.place_order(order_type = "N", instrument_token = peinstrumentToken_int, transaction_type = "Buy",\
-            #        quantity = lot, price = 0, disclosed_quantity = 0, trigger_price = (2.5*pesold),\
-            #        tag = "bnf_3pm_ex.py", validity = "GFD", variety = "REGULAR")
-
-            ###################################################
         elif issell == 1:
-            print("Already Sold CE at Rs.", cesold, " * ", lot, " = Rs.", (cesold*lot))
-            print("P&L= Rs.",((cesold - celtp)*lot) )
-        elif issell == 2:
-            print("Already Sold PE")
-            print("P&L= Rs.",((pesold - peltp)*lot) )
+            print("Already Sold stradle at Rs.", sold_stradle_premium, " * ", lot, " = Rs.", "%.2f" % (sold_stradle_premium*lot))
+            print("P&L= Rs.", "%.2f" % ((sold_stradle_premium - stradle_premium)*lot) )
         else:
             print("No TRADE")
-
+        ########################################################
     client.subscribe(input_tokens=ws_token, callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
 
 except Exception as e:
