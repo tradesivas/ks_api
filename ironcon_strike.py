@@ -37,7 +37,7 @@ instrumentName = 'BANKNIFTY'
 underlying_name = 'NIFTY BANK'
 max_opt_price = 9.5
 lot = 25
-strike_gap = 0
+strike_gap = 1200
 
 ############################################################################
 
@@ -49,12 +49,12 @@ quote_response = client.quote(instrument_token = underlying_token)
 ltp = quote_response['success'][0]['ltp']
 ltp = float(ltp)
 atm = round(ltp/100)*100
-protection_per = 1.3
+protection_per = 3.5
 upper_protection_per = 0.0
 lower_protection_per = 0.0
 i = 1
 ceshort = atm
-while ((upper_protection_per < protection_per) or (lower_protection_per < protection_per)) & (ceshort <= (atm+1000)):
+while ((upper_protection_per < protection_per) or (lower_protection_per < protection_per)) & (ceshort <= (atm+3000)):
     ceshort = atm + strike_gap
     peshort = atm - strike_gap
     celong = ceshort+100

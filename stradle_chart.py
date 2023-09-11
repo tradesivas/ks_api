@@ -67,15 +67,13 @@ df1.columns = ['null_0', 'opt_token', 'null_2', 'null_3', 'null_4', 'null_5', 'l
 pldf1 = pd.DataFrame(data={'Time':[''],'Price':['']})
 
 ##############################################################################
-t = 0
 x = list()
 y = list()
 ###############################################################################
-issell = 0
 try:
     def callback_method(message):
         #print(message)
-        global df, df1, ltp, celtp, peltp, issell, cesold, pesold, stradle_premium, sold_stradle_premium, time_str, time_obj, time1_str, time1_obj, pnl, fig, ax1,ani, pldf, pldf1, t, x , y, ct
+        global df, df1, ltp, celtp, peltp, stradle_premium, time_str, time_obj, ani, x , y, ct
         #print("Your logic/computation will come here.")
         #print(type(message))
         df = pd.DataFrame([message])
@@ -96,8 +94,9 @@ try:
         #print(df1)
         celtp = float(df1.loc[(df1['opt_token'] == ceinstrumentToken), 'null_2'].iloc[0])
         peltp = float(df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_2'].iloc[0])
-        time1 = (df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_19'].iloc[0])
-        ct = datetime.now().strftime("%H:%M:%S")
+        time_str = (df1.loc[(df1['opt_token'] == peinstrumentToken), 'null_19'].iloc[0])
+        ct = datetime.strptime(time_str, '%d/%m/%Y %H:%M:%S')
+        #ct = datetime.now().strftime("%H:%M:%S")
         stradle_premium = round((celtp + peltp),0)
         print(strike,"CE LTP = ", celtp)
         print(strike,"PE LTP = ", peltp)
@@ -112,7 +111,6 @@ try:
         ########################################################
         x.append(ct)
         y.append(stradle_premium)
-        t+=1
     client.subscribe(input_tokens=ws_token, callback=callback_method, broadcast_host="https://wstreamer.kotaksecurities.com/feed")
 
 

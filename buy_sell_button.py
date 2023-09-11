@@ -15,7 +15,7 @@ consumer_key = os.getenv("consumer_key")
 password = os.getenv("password")
 host = os.getenv("host")
 otp = os.getenv("otp")
-amount = 9000
+amount = 100
 instrumentName = input("Enter Instrument Name: ").upper()
 instrumentToken = df.loc[(df['instrumentName'] == instrumentName) & (df['instrumentType'] == 'EQ') & (df['segment'] == 'CASH') & (df['exchange'] == 'NSE'), 'instrumentToken'].iloc[0]
 instrumentToken  = int(instrumentToken)
@@ -65,7 +65,7 @@ def buy_mcx():
         print(order_response)
         o_id = order_response['Success']['NSE']['orderId']
         print("OrderId= ",o_id)
-        netq = 99999
+        netq = 500
         status = 'OPN'
         while ((netq != 0) or (netq == qty)) and status == 'OPN':
             o_r=client.order_report(order_id = o_id)

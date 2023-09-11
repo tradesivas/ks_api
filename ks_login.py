@@ -21,13 +21,6 @@ newotp= input("Enter NEW OTP: ")
 session_response = client.session_2fa(access_code = newotp)
 print("---------------session response---------------")
 print(session_response)
-#quote = client.quote(instrument_token = 110)
-#print(quote)
-#client.place_order(order_type = "N", instrument_token = 3867, transaction_type = "BUY", quantity = 1, price = 180, \
-                   #disclosed_quantity = 0, trigger_price = 0, tag = "ks_login_py", validity = "GFD", variety = "REGULAR", \
-                   #product = "NORMAL" ,smart_order_routing="string")
-#order_report = client.order_report()
-#print(order_report)
 logout_response = client.logout()
 print("---------------logout response---------------")
 print(logout_response)

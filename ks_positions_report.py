@@ -19,3 +19,10 @@ client.login(password = password)
 
 #Generated session token
 client.session_2fa(access_code = otp)
+
+try:
+    # Get's position by position_type.
+    o_position = client.positions(position_type = "OPEN")
+    print(o_position)
+except Exception as e:
+    print("Exception when calling PositionsApi->positions: %s\n" % e)
